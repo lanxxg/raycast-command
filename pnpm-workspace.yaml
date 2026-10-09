@@ -1,0 +1,9 @@
+allowBuilds:
+  esbuild: true
+minimumReleaseAgeExclude:
+  - '@ai-sdk/deepseek@3.0.63'
+  - '@ai-sdk/gateway@4.0.110'
+  - '@ai-sdk/provider-utils@5.0.58'
+  - '@ai-sdk/provider@4.0.26'
+  - '@raycast/api@2.7.2'
+  - ai@7.0.136

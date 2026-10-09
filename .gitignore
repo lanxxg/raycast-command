@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.vite/
+.vite-plus/
+.DS_Store
+.env*
+raycast-env.d.ts
+.pnpm-store/

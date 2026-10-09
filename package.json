@@ -1,0 +1,89 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "raycast-command",
+  "version": "0.0.1",
+  "description": "A series of Raycast commands for daily use.",
+  "categories": [
+    "Developer Tools",
+    "Productivity"
+  ],
+  "license": "MIT",
+  "author": "lanxxg",
+  "type": "module",
+  "scripts": {
+    "dev": "ray develop",
+    "build": "ray build -e dist -o dist",
+    "check": "vp check",
+    "format": "vp fmt",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@ai-sdk/deepseek": "^3.0.63",
+    "@raycast/api": "^2.7.2",
+    "@raycast/utils": "^2.3.2",
+    "ai": "^7.0.136",
+    "dedent": "^1.7.2",
+    "diff": "^9.0.0",
+    "react": "^19.3.0",
+    "turndown": "^7.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.17",
+    "@types/react": "^19.3.0",
+    "@types/turndown": "^5.0.6",
+    "typescript": "^7.0.2",
+    "vite-plus": "^1.1.0"
+  },
+  "icon": "extension-icon.png",
+  "engines": {
+    "node": ">=22.22.2"
+  },
+  "packageManager": "pnpm@12.10.1",
+  "commands": [
+    {
+      "name": "to-chinese",
+      "title": "To Chinese",
+      "description": "Translate into natural Chinese while preserving technical terms and code.",
+      "mode": "no-view"
+    },
+    {
+      "name": "to-english",
+      "title": "To English",
+      "description": "Translate into fluent English with a Chinese back-translation.",
+      "mode": "no-view"
+    },
+    {
+      "name": "fix-spelling-and-grammar",
+      "title": "Fix Spelling and Grammar",
+      "description": "Correct English spelling, grammar, and phrasing with minimal changes.",
+      "mode": "no-view"
+    },
+    {
+      "name": "result",
+      "title": "Result",
+      "description": "Display the result of a language command.",
+      "mode": "view"
+    }
+  ],
+  "platforms": [
+    "macOS"
+  ],
+  "preferences": [
+    {
+      "name": "apiKey",
+      "type": "password",
+      "required": true,
+      "title": "DeepSeek API Key",
+      "description": "Your API key from platform.deepseek.com. Requests go directly to DeepSeek."
+    },
+    {
+      "name": "model",
+      "type": "textfield",
+      "required": true,
+      "title": "DeepSeek Model",
+      "description": "Choose the model to use for AI commands.",
+      "default": "deepseek-flash"
+    }
+  ],
+  "title": "Raycast Command"
+}
