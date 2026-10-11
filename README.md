@@ -41,7 +41,7 @@ Results stream into a Markdown view. After a grammar fix finishes, added or chan
 
 ### Limits
 
-Input is limited to 30,000 characters. Requests time out after two minutes, and output is capped at 8,192 tokens. Starting another command or closing the result view cancels the previous request. Incomplete results can only be copied with **⌘ ⇧ C**.
+Input is limited to 30,000 characters. Requests time out after two minutes. Starting another command or closing the result view cancels the previous request. Incomplete results can only be copied with **⌘ ⇧ C**.
 
 ## Privacy
 
