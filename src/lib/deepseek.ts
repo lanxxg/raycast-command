@@ -60,7 +60,6 @@ export async function generate(
     ...buildPrompts(command, text),
     providerOptions: { deepseek: { thinking: { type: "disabled" } } },
     abortSignal: signal,
-    maxOutputTokens: 8192,
     maxRetries: 1,
     // Handle errors below instead of the SDK default logger (which includes request data).
     onError: () => {},
