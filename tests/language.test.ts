@@ -1,8 +1,13 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vite-plus/test";
+import manifest from "../package.json";
 import {
   buildPrompts,
+  commandIds,
   commands,
+  directOpenGuidance,
   inputError,
+  presentCommand,
   resultText,
   type CommandId,
 } from "../src/lib/commands";
@@ -10,6 +15,20 @@ import { systemPrompt } from "../src/lib/prompts";
 import { errorMessage, generate } from "../src/lib/deepseek";
 
 const settings = { apiKey: "test-only-key", model: "deepseek-v4-flash" };
+
+const taskPhrase: Record<CommandId, string> = {
+  "to-chinese": "natural and accurate Chinese",
+  "to-english": "word-for-word literal translation",
+  "fix-spelling-and-grammar": "Act as a spelling corrector and improver",
+  "improve-writing": "text improver/editor",
+  "explain-this-in-simple-terms": "Act as a dictionary and encyclopedia",
+  "make-longer": "expanding a client's text",
+  "make-shorter": "shortening a client's text",
+  "change-tone-to-professional": "Professional tone of voice",
+  "change-tone-to-friendly": "Friendly and optimistic tone of voice",
+  "change-tone-to-confident": "Avoid hedging, be definite where possible",
+  "change-tone-to-casual": "OK to use slang and contractions",
+};
 function response(parts: string[], finishReason = "stop") {
   const chunks = parts.map((text) => ({
     id: "test",
@@ -58,6 +77,120 @@ describe("result text", () => {
 
   it("only trims other commands", () => {
     expect(resultText("to-chinese", "\n```js\n// 注释\n```\n")).toBe("```js\n// 注释\n```");
+    const formatted =
+      "### Translation Result\n\n```\nInner\n```\n\n### Back-Translation\n\n```\n回译\n```";
+    for (const id of commandIds()) {
+      if (id === "to-english") continue;
+      expect(resultText(id, `\n  hello  \n`)).toBe("hello");
+      expect(resultText(id, `\n${formatted}\n`)).toBe(formatted);
+    }
+  });
+});
+
+describe("presentation", () => {
+  it("shows the full To English response and copies only the translation", () => {
+    const output =
+      "\n### Translation Result\n\n```\nShip it today.\n```\n\n### Back-Translation\n\n```\n今天发布。\n```\n";
+    const highlight = vi.fn(() => "highlighted");
+    const presented = presentCommand("to-english", {
+      status: "done",
+      input: "今天发布",
+      output,
+      largeText: false,
+      highlightChanges: highlight,
+    });
+    expect(presented.shown).toBe(output);
+    expect(presented.copied).toBe("Ship it today.");
+    expect(highlight).not.toHaveBeenCalled();
+  });
+
+  it("highlights a finished grammar fix and leaves a stream unchanged", () => {
+    const output = "\n  Fixed.  \n";
+    const highlight = vi.fn(() => "highlighted");
+    const streaming = presentCommand("fix-spelling-and-grammar", {
+      status: "streaming",
+      input: "Fixd.",
+      output,
+      largeText: true,
+      highlightChanges: highlight,
+    });
+    expect(streaming.shown).toBe(output);
+    expect(highlight).not.toHaveBeenCalled();
+    const done = presentCommand("fix-spelling-and-grammar", {
+      status: "done",
+      input: "Fixd.",
+      output,
+      largeText: true,
+      highlightChanges: highlight,
+    });
+    expect(done.shown).toBe("highlighted");
+    expect(done.copied).toBe("Fixed.");
+    expect(highlight).toHaveBeenCalledTimes(1);
+    expect(highlight).toHaveBeenCalledWith("Fixd.", output, true);
+  });
+
+  it("shows and copies plain text for a rewrite, without highlights", () => {
+    const output = "\n  Clearer wording.  \n";
+    const highlight = vi.fn(() => "highlighted");
+    const presented = presentCommand("improve-writing", {
+      status: "done",
+      input: "wording that is less clear",
+      output,
+      largeText: false,
+      highlightChanges: highlight,
+    });
+    expect(presented.shown).toBe(output);
+    expect(presented.copied).toBe("Clearer wording.");
+    expect(highlight).not.toHaveBeenCalled();
+  });
+});
+
+describe("command record", () => {
+  it("lists language commands in record order, then the result view", () => {
+    const rows = manifest.commands;
+    expect(rows).toHaveLength(commandIds().length + 1);
+    expect(rows.at(-1)).toMatchObject({ name: "result", mode: "view" });
+    expect(rows.slice(0, -1)).toEqual(
+      commandIds().map((id) => ({
+        name: id,
+        title: commands[id].title,
+        description: commands[id].description,
+        mode: "no-view",
+      })),
+    );
+  });
+
+  it("gives each command a launcher that names itself", () => {
+    for (const id of commandIds()) {
+      const source = readFileSync(new URL(`../src/${id}.tsx`, import.meta.url), "utf8");
+      expect(source).toContain(`launchLanguageCommand("${id}")`);
+    }
+  });
+
+  it("names every command when Result is opened with no selection", () => {
+    const guidance = directOpenGuidance();
+    expect(guidance.startsWith("Select text in another app, then run a language command.")).toBe(
+      true,
+    );
+    for (const id of commandIds()) {
+      expect(guidance).toContain(`- **${commands[id].title}**`);
+    }
+  });
+
+  it("documents every command title and description", () => {
+    const readme = readFileSync(new URL("../README.md", import.meta.url), "utf8");
+    for (const id of commandIds()) {
+      expect(readme).toContain(commands[id].title);
+      expect(readme).toContain(commands[id].description);
+    }
+  });
+
+  it("keeps command ids out of the result view", () => {
+    const source = readFileSync(
+      new URL("../src/components/language-command.tsx", import.meta.url),
+      "utf8",
+    );
+    expect(commandIds().filter((id) => source.includes(id))).toEqual([]);
   });
 });
 
@@ -216,7 +349,7 @@ describe("DeepSeek integration through the real AI SDK", () => {
 });
 
 describe("prompt construction", () => {
-  it.each(Object.keys(commands) as CommandId[])(
+  it.each(commandIds())(
     "inserts selection literally under the shared system prompt for %s",
     (command) => {
       const selection = "$& $` {selection} \n```code```";
@@ -225,12 +358,19 @@ describe("prompt construction", () => {
       expect(prompts.system).toBe(systemPrompt);
     },
   );
-  it.each(Object.keys(commands) as CommandId[])(
-    "expands every placeholder marker for %s",
-    (command) => {
-      expect(buildPrompts(command, "Hello").prompt).not.toMatch(/\\\(\w+\)/);
-    },
-  );
+  it.each(commandIds())("sends that command's task rules with the selection for %s", (command) => {
+    const selection = "selection-token";
+    const built = buildPrompts(command, selection).prompt;
+    expect(built).toContain(selection);
+    expect(built).toContain(taskPhrase[command]);
+    for (const id of commandIds()) {
+      if (id === command) continue;
+      expect(buildPrompts(id, selection).prompt).not.toContain(taskPhrase[command]);
+    }
+  });
+  it.each(commandIds())("expands every placeholder marker for %s", (command) => {
+    expect(buildPrompts(command, "Hello").prompt).not.toMatch(/\\\(\w+\)/);
+  });
   it("expands placeholders in the template but not in the selection", () => {
     const prompt = buildPrompts("fix-spelling-and-grammar", String.raw`see \(maintainURLs)`).prompt;
     expect(prompt).toContain("Reply only with the rewritten text and nothing else.");
@@ -245,7 +385,6 @@ describe("prompt construction", () => {
     expect(systemPrompt).not.toContain("{selection}");
   });
   it("asks for the Chinese translation without a preamble", () => {
-    // The template has no output rule of its own; the shared system prompt supplies it.
     expect(buildPrompts("to-chinese", "Hello").system).toContain(
       "Reply only with the result, without any preamble",
     );

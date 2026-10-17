@@ -2,11 +2,19 @@
 
 Raycast extension (macOS only) that provides a series of Raycast commands for daily use.
 
-| Command                  | Result                                                                                              |
-| ------------------------ | --------------------------------------------------------------------------------------------------- |
-| To Chinese               | Natural Chinese with English technical terms and code preserved; only code comments are translated. |
-| To English               | Fluent English followed by a Chinese back-translation to check meaning.                             |
-| Fix Spelling and Grammar | Corrected English with minimal changes, preserving meaning, tone, and formatting.                   |
+| Command                      | Result                                                                       |
+| ---------------------------- | ---------------------------------------------------------------------------- |
+| To Chinese                   | Translate into natural Chinese while preserving technical terms and code.    |
+| To English                   | Translate into fluent English with a Chinese back-translation.               |
+| Fix Spelling and Grammar     | Correct English spelling, grammar, and phrasing with minimal changes.        |
+| Improve Writing              | Rewrite for clarity and concision while keeping meaning, tone, and language. |
+| Explain This in Simple Terms | Explain the selection in simple terms.                                       |
+| Make Longer                  | Expand the selection while keeping its tone, language, and facts.            |
+| Make Shorter                 | Shorten the selection while keeping its tone, language, and core meaning.    |
+| Change Tone to Professional  | Rewrite in a professional, formal tone without changing meaning or length.   |
+| Change Tone to Friendly      | Rewrite in a friendly, optimistic tone without changing meaning or length.   |
+| Change Tone to Confident     | Rewrite in a confident tone without hedging, keeping meaning and length.     |
+| Change Tone to Casual        | Rewrite in a casual, friendly tone without changing meaning or length.       |
 
 ## Motivation
 
@@ -27,7 +35,7 @@ pnpm dev
 
 Select text in another app, then launch a command. Assign hotkeys in Raycast Settings → Extensions for quick access. Commands only use the selected text; if nothing is selected, a toast tells you so. Grant Raycast Accessibility access in macOS System Settings if selection or paste doesn't work.
 
-**Result** is the shared view all three commands open their output in. Keep it enabled, but run the three language commands instead of launching it directly. Each hotkey press reads the current selection, even when a previous result is still open.
+**Result** is the shared view. Every language command opens its output there. Keep Result enabled, and launch a language command instead of opening Result directly. Each hotkey press reads the current selection, even when a previous result is still open.
 
 Results stream into a Markdown view. After a grammar fix finishes, added or changed words are highlighted in green. The highlights are drawn as images because Raycast's Detail view can't color inline text; **Hide Highlights** switches back to selectable text. Copy and paste always use the plain corrected text.
 
