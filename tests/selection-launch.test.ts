@@ -1,3 +1,4 @@
+/// <reference types="vite-plus/client" />
 import { existsSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import {
@@ -16,11 +17,10 @@ import { commandIds, directOpenGuidance } from "../src/lib/commands";
 import type { LanguageLaunchContext } from "../src/lib/launch-language-command";
 import { readSelection } from "../src/lib/selection";
 
-const launchers = (
-  import.meta as ImportMeta & {
-    glob<T>(pattern: string, options: { eager: true; import: "default" }): Record<string, T>;
-  }
-).glob<() => Promise<void>>("../src/*.tsx", { eager: true, import: "default" });
+const launchers = import.meta.glob<() => Promise<void>>("../src/*.tsx", {
+  eager: true,
+  import: "default",
+});
 
 vi.mock("@raycast/api", () => ({
   getFrontmostApplication: vi.fn(),

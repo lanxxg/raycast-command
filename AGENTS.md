@@ -23,6 +23,7 @@ Vite+ is installed locally as `vite-plus` and configured in `vite.config.ts`. Ra
 ## Adding a command
 
 1. Write a prompt containing `{selection}` in `src/lib/prompts.ts`.
-2. Add a record entry in `src/lib/commands.ts` with its title, description, and prompt. `CommandId` is `keyof` that record. Presentation stays internal to the record.
+2. Add an entry to `commands` in `src/lib/commands.ts` with its `title`, `prompt`, and `presentation` (`"plain"`, `"translation-result"`, or `"grammar-diff"`). `CommandId` is `keyof` that record.
 3. Add `src/<name>.tsx` calling `launchLanguageCommand("<name>")`.
-4. Add a `no-view` entry to `commands` in `package.json`. Tests derive the launcher list and the manifest check from the record.
+4. Add a `no-view` entry to `commands` in `package.json`, before `result`, with the same title and a description. The description lives only in `package.json` (not in the record).
+5. Copy the same title and description into `README.md`. Tests check the manifest, launchers, prompts, and README against the record.

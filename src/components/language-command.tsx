@@ -12,14 +12,18 @@ import {
   Toast,
 } from "@raycast/api";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { commands, inputError, presentCommand, type CommandId } from "../lib/commands";
+import {
+  commands,
+  inputError,
+  presentCommand,
+  type CommandId,
+  type RunStatus,
+} from "../lib/commands";
 import { errorMessage, generate, type Settings } from "../lib/deepseek";
 import { grammarDiffMarkdown } from "../lib/grammar-diff";
 
-type Status = "loading" | "no-input" | "streaming" | "done" | "stopped" | "error";
-
 export function LanguageCommand({ command, input }: { command: CommandId; input: string }) {
-  const [status, setStatus] = useState<Status>("loading");
+  const [status, setStatus] = useState<RunStatus>("loading");
   const [output, setOutput] = useState("");
   const [error, setError] = useState<string>();
   const [showHighlights, setShowHighlights] = useState(true);
@@ -30,15 +34,13 @@ export function LanguageCommand({ command, input }: { command: CommandId; input:
     () =>
       presentCommand(command, {
         status,
-        input,
         output,
-        largeText: environment.textSize === "large",
-        highlightChanges: (source, revised, large) =>
+        highlightChanges: () =>
           grammarDiffMarkdown(
-            source,
-            revised,
+            input,
+            output,
             { added: Color.Green, unchanged: Color.PrimaryText },
-            large,
+            environment.textSize === "large",
           ),
       }),
     [command, status, input, output],
