@@ -59,6 +59,54 @@
       "mode": "no-view"
     },
     {
+      "name": "improve-writing",
+      "title": "Improve Writing",
+      "description": "Rewrite for clarity and concision while keeping meaning, tone, and language.",
+      "mode": "no-view"
+    },
+    {
+      "name": "explain-this-in-simple-terms",
+      "title": "Explain This in Simple Terms",
+      "description": "Explain the selection in simple terms.",
+      "mode": "no-view"
+    },
+    {
+      "name": "make-longer",
+      "title": "Make Longer",
+      "description": "Expand the selection while keeping its tone, language, and facts.",
+      "mode": "no-view"
+    },
+    {
+      "name": "make-shorter",
+      "title": "Make Shorter",
+      "description": "Shorten the selection while keeping its tone, language, and core meaning.",
+      "mode": "no-view"
+    },
+    {
+      "name": "change-tone-to-professional",
+      "title": "Change Tone to Professional",
+      "description": "Rewrite in a professional, formal tone without changing meaning or length.",
+      "mode": "no-view"
+    },
+    {
+      "name": "change-tone-to-friendly",
+      "title": "Change Tone to Friendly",
+      "description": "Rewrite in a friendly, optimistic tone without changing meaning or length.",
+      "mode": "no-view"
+    },
+    {
+      "name": "change-tone-to-confident",
+      "title": "Change Tone to Confident",
+      "description": "Rewrite in a confident tone without hedging, keeping meaning and length.",
+      "mode": "no-view"
+    },
+    {
+      "name": "change-tone-to-casual",
+      "title": "Change Tone to Casual",
+      "description": "Rewrite in a casual, friendly tone without changing meaning or length.",
+      "mode": "no-view"
+    },
+    {
       "name": "result",
       "title": "Result",
       "description": "Display the result of a language command.",
