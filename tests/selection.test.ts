@@ -45,6 +45,42 @@ describe("HTML to Markdown", () => {
       "Rename file_name to 2 * 3 [draft] #1",
     );
   });
+
+  it("converts a table with a header row to a GFM table", () => {
+    expect(
+      htmlToMarkdown(
+        `<p>Intro</p><table><thead><tr><th>Format</th><th>Windows Shortcut</th><th>Markdown Syntax</th></tr></thead><tbody>` +
+          `<tr><td>Heading 1</td><td><span><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>1</kbd></span></td><td>Type <code>#</code> on a new line</td></tr>` +
+          `<tr><td>Code block</td><td></td><td><p>Type <code>\`\`\`</code></p><p>a | b</p></td></tr>` +
+          `</tbody></table><p>Outro</p>`,
+      ),
+    ).toBe(
+      [
+        "Intro",
+        "",
+        "| Format | Windows Shortcut | Markdown Syntax |",
+        "| --- | --- | --- |",
+        "| Heading 1 | Ctrl Alt 1 | Type `#` on a new line |",
+        "| Code block |  | Type ` ``` ` a \\| b |",
+        "",
+        "Outro",
+      ].join("\n"),
+    );
+  });
+
+  it("separates touching keycaps with a space and leaves separated ones alone", () => {
+    expect(
+      htmlToMarkdown(
+        "<p><kbd>Ctrl</kbd><kbd>C</kbd>, <kbd>Ctrl</kbd>+<kbd>V</kbd>, <kbd>Cmd</kbd> <kbd>Z</kbd>, press <kbd>Esc</kbd>, not <kbd>Q</kbd></p>",
+      ),
+    ).toBe("Ctrl C, Ctrl+V, Cmd Z, press Esc, not Q");
+  });
+
+  it("leaves layout tables (no header row) as blocks", () => {
+    expect(htmlToMarkdown("<table><tr><td>Left</td><td>Right</td></tr></table>")).toBe(
+      "Left\n\nRight",
+    );
+  });
 });
 
 describe("reading the selection", () => {

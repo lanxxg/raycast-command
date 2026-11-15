@@ -93,6 +93,45 @@ turndown.addRule("listItem", {
   },
 });
 
+function headerRowOf(node: Node): Element | null {
+  let table: Node | null = node;
+  while (table && table.nodeName !== "TABLE") table = table.parentNode;
+  const row = (table as Element | null)?.getElementsByTagName("tr")[0];
+  if (!row?.children.length) return null;
+  return Array.from(row.children).every((cell) => cell.nodeName === "TH") ? row : null;
+}
+
+turndown.addRule("tableCell", {
+  filter: (node) => (node.nodeName === "TH" || node.nodeName === "TD") && !!headerRowOf(node),
+  replacement(content) {
+    const text = content
+      .trim()
+      .replace(/\s*\n\s*/g, " ")
+      .replace(/\|/g, "\\|");
+    return ` ${text} |`;
+  },
+});
+turndown.addRule("tableRow", {
+  filter: (node) => node.nodeName === "TR" && !!headerRowOf(node),
+  replacement(content, node) {
+    const headerRow = headerRowOf(node);
+    const divider = headerRow === node ? "\n|" + " --- |".repeat(headerRow.children.length) : "";
+    return `\n|${content}${divider}`;
+  },
+});
+turndown.addRule("tableSection", {
+  filter: (node) => ["THEAD", "TBODY", "TFOOT"].includes(node.nodeName) && !!headerRowOf(node),
+  replacement: (content) => content,
+});
+turndown.addRule("table", {
+  filter: (node) => node.nodeName === "TABLE" && !!headerRowOf(node),
+  replacement: (content) => `\n\n${content.trim()}\n\n`,
+});
+turndown.addRule("keycap", {
+  filter: "kbd",
+  replacement: (content, node) => content + (node.nextSibling?.nodeName === "KBD" ? " " : ""),
+});
+
 export function htmlToMarkdown(html: string): string {
   return turndown.turndown(html).trim();
 }
