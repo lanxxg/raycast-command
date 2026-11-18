@@ -20,6 +20,10 @@ Tests use a fake API key and mocked network responses, so they make no paid requ
 
 Vite+ is installed locally as `vite-plus` and configured in `vite.config.ts`. Raycast needs its own bundler and dev host, so `pnpm dev` and `pnpm build` run `ray develop` and `ray build`.
 
+## Cursor Cloud specific instructions
+
+Cloud Agents run on Linux. Verify changes with `pnpm test` and `pnpm check`. `pnpm dev` and `pnpm build` call the Raycast CLI (`ray`), which ships with the Raycast macOS app and is not installed here. The environment provides Node.js 22.22.2 because `@raycast/api` and `vite-plus` reject the default image's older Node. Tests use a fake API key and mocked responses, so they do not call DeepSeek.
+
 ## Adding a command
 
 1. Write a prompt containing `{selection}` in `src/lib/prompts.ts`.
